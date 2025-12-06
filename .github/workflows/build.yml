@@ -1,27 +1,35 @@
-name: Build Windows EXE
+name: Build jxrlib Windows
 
 on:
-  workflow_dispatch:     # 可以手动点击运行
-  push:                  # 每次 push 自动编译
-    branches: [ main ]
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - main
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Set up MSVC
-      uses: ilammy/msvc-dev-cmd@v1
+      - name: Install Visual Studio components
+        uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Build with MSVC
-      run: |
-        cl /EHsc /O2 your_program.cpp /Fe:your_program.exe
+      - name: Build with Make (or with MSVC)
+        run: |
+          cd .
+          # 如果 Makefile 可用于 Windows + mingw / msys
+          mingw32-make   # 或 make depending on environment
+          # 如果你 prefer MSVC，可以替换为 cl / … 命令
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-build
-        path: your_program.exe
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: jxrlib-windows-build
+          path: |
+            ./bin/*.exe
+            ./bin/*.dll
+            ./bin/*.lib
