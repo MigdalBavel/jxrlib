@@ -1,11 +1,8 @@
-name: Build jxrlib Windows
+name: Build jxrlib with MSVC
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - master
-      - main
 
 jobs:
   build:
@@ -15,21 +12,18 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install Visual Studio components
+      - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Build with Make (or with MSVC)
+      - name: Build jxrlib (MSVC NMAKE)
         run: |
-          cd .
-          # 如果 Makefile 可用于 Windows + mingw / msys
-          mingw32-make   # 或 make depending on environment
-          # 如果你 prefer MSVC，可以替换为 cl / … 命令
+          nmake /f Makefile.mak all
 
-      - name: Upload result
+      - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:
           name: jxrlib-windows-build
           path: |
-            ./bin/*.exe
-            ./bin/*.dll
-            ./bin/*.lib
+            bin/*.exe
+            bin/*.dll
+            bin/*.lib
